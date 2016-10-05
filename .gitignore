@@ -1,0 +1,8 @@
+composer.phar
+/vendor/
+puphpet
+node_modules
+*.DS_Store
+logs
+.vagrant
+composer.lock

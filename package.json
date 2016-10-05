@@ -1,0 +1,20 @@
+{
+  "name": "php-experiments",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^2.13.1",
+    "eslint-config-airbnb-base": "^3.0.1",
+    "eslint-plugin-import": "^1.15.0",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^2.1.0",
+    "gulp-notify": "^2.2.0",
+    "gulp-phpcs": "^1.1.1",
+    "gulp-phplint": "^0.3.2",
+    "gulp-phpunit": "^0.19.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-watch": "^4.3.9"
+  }
+}
