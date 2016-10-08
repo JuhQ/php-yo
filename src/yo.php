@@ -28,6 +28,36 @@ class Yo
         return is_string($val);
     }
 
+    public function isArray($val)
+    {
+        return is_array($val);
+    }
+
+    public function isEmpty($val)
+    {
+        return $this->size($val) === 0;
+    }
+
+    public function isFinite($n)
+    {
+        return $this->isNumber($n) && is_finite($n);
+    }
+
+    public function isPositive($n)
+    {
+        return $this->isFinite($n) && $n > 0;
+    }
+
+    public function isNegative($n)
+    {
+        return $this->isFinite($n) && $n < 0;
+    }
+
+    public function isNumber($val)
+    {
+        return is_int($val) || is_float($val);
+    }
+
     public function isPalindrome($str)
     {
         if (!$this->isString($str)) {
@@ -96,6 +126,17 @@ class Yo
     public function reduce($arr, $callback, $initial)
     {
         return array_reduce($arr, $callback, $initial);
+    }
+
+    public function flatten($arr)
+    {
+        if ($this->isEmpty($arr)) {
+            return [];
+        }
+
+        return $this->reduce($arr, function ($a, $b) {
+            return array_merge($a, $this->isArray($b) ? $this->flatten($b) : [$b]);
+        }, []);
     }
 
     public function max($arr)

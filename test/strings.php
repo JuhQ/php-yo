@@ -59,4 +59,11 @@ class YoStrings extends TestCase
         $this->assertEquals($yo->kebabCase('Kebab Case'), 'kebab-case');
         $this->assertEquals($yo->kebabCase('  Kebab Case  '), 'kebab-case');
     }
+
+    public function testIsEmpty()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->isEmpty(''), true);
+        $this->assertEquals($yo->isEmpty('string'), false);
+    }
 }

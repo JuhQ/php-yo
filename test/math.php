@@ -54,4 +54,38 @@ class YoMath extends TestCase
         $yo = new Yo();
         $this->assertEquals($yo->min([4, 2, 8, 6]), 2);
     }
+
+    public function testIsFinite()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->isFinite(1), true);
+        $this->assertEquals($yo->isFinite(INF), false);
+    }
+
+    public function testIsPositive()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->isPositive(1), true);
+        $this->assertEquals($yo->isPositive(-1), false);
+        $this->assertEquals($yo->isPositive('string'), false);
+        $this->assertEquals($yo->isPositive([]), false);
+    }
+
+    public function testIsNegative()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->isNegative(-1), true);
+        $this->assertEquals($yo->isNegative(1), false);
+        $this->assertEquals($yo->isNegative('string'), false);
+        $this->assertEquals($yo->isNegative([]), false);
+    }
+
+    public function testIsNumber()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->isNumber(1), true);
+        $this->assertEquals($yo->isNumber(INF), true);
+        $this->assertEquals($yo->isNumber('string'), false);
+        $this->assertEquals($yo->isNumber([]), false);
+    }
 }
