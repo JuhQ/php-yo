@@ -1,6 +1,9 @@
 <?php
 namespace Yo;
 
+include_once('chain.php');
+
+
 class Yo
 {
     public function lowercase($str)
@@ -80,6 +83,44 @@ class Yo
         }
 
         return count($val);
+    }
+
+    // TODO: no tests for this function
+    public function random($min = 0, $max = 0)
+    {
+        if (!$this->isNumber($min)) {
+            $min = 0;
+        }
+        if (!$this->isNumber($max)) {
+            $max = 1;
+        }
+
+        return mt_rand($min, $max);
+    }
+
+    public function range($n)
+    {
+        return range(0, $n);
+    }
+
+    public function inRange($min, $max, $value)
+    {
+        if (!$this->isNumber($min) || !$this->isNumber($max) || !$this->isNumber($value)) {
+            return false;
+        }
+
+        return ($min <= $value) && ($value <= $max);
+    }
+
+    public function filter($arr, $callback)
+    {
+        return array_values(array_filter($arr, $callback));
+    }
+
+    // TODO: no tests for this function
+    public function sample($arr)
+    {
+        return $this->first(shuffle($arr));
     }
 
     public function map($arr, $callback = false)
@@ -199,5 +240,10 @@ class Yo
         }
 
         return array_reverse($val);
+    }
+
+    public function chain($data)
+    {
+        return new \Yo\Chain($data);
     }
 }

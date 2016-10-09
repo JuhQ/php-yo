@@ -50,4 +50,15 @@ class YoFunctions extends TestCase
         $this->assertEquals($yo->size('the length of this string is 31'), 31);
         $this->assertEquals($yo->size([1, 2, 3, 4, 5]), 5);
     }
+
+    public function testInRange()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->inRange(1, 3, 2), true);
+        $this->assertEquals($yo->inRange(1, 100, 50), true);
+        $this->assertEquals($yo->inRange(1, 100, 500), false);
+        $this->assertEquals($yo->inRange('string', 100, 500), false);
+        $this->assertEquals($yo->inRange(1, 'string', 500), false);
+        $this->assertEquals($yo->inRange(1, 100, 'string'), false);
+    }
 }

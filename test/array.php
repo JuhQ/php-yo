@@ -45,4 +45,27 @@ class YoArray extends TestCase
         $yo = new Yo();
         $this->assertEquals($yo->rest([1, 2, 3]), [2, 3]);
     }
+
+    public function testRange()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->range(4), [0, 1, 2, 3, 4]);
+    }
+
+    public function testFilter()
+    {
+        $callback = function ($i) {
+            return $i === 1;
+        };
+
+        $yo = new Yo();
+        $this->assertEquals($yo->filter([1, 2, 1, 2, 3], $callback), [1, 1]);
+    }
+
+    public function testReduce()
+    {
+        $yo = new Yo();
+        $data = $yo->reduce([4, 8, 15, 16, 23, 42], [$yo, 'add'], 0);
+        $this->assertEquals($data, 108);
+    }
 }
