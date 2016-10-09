@@ -51,6 +51,12 @@ class YoArray extends TestCase
         $yo = new Yo();
         $this->assertEquals($yo->range(4), [0, 1, 2, 3, 4]);
     }
+    public function testTimes()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->times(4), [0, 1, 2, 3, 4]);
+        $this->assertEquals($yo->times(4), $yo->range(4));
+    }
 
     public function testFilter()
     {

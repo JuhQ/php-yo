@@ -104,6 +104,11 @@ class Yo
         return range(0, $n);
     }
 
+    public function times($n)
+    {
+        return $this->range($n);
+    }
+
     public function inRange($min, $max, $value)
     {
         if (!$this->isNumber($min) || !$this->isNumber($max) || !$this->isNumber($value)) {
@@ -163,6 +168,11 @@ class Yo
     public function sum($arr)
     {
         return $this->reduce($arr, [$this, 'add'], 0);
+    }
+
+    public function factorial($n)
+    {
+        return $this->reduce($this->rest($this->times($n)), [$this, 'multiply'], 1);
     }
 
     public function reduce($arr, $callback, $initial)
