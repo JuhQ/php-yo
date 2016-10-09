@@ -3,6 +3,10 @@ namespace Yo;
 
 class LazyChain
 {
+    private $yo;
+    private $data;
+    private $actions;
+
     public function __construct($data)
     {
         $this->yo = new Yo();
