@@ -2,6 +2,7 @@
 namespace Yo;
 
 include_once('chain.php');
+include_once('lazy-chain.php');
 
 
 class Yo
@@ -245,5 +246,10 @@ class Yo
     public function chain($data)
     {
         return new \Yo\Chain($data);
+    }
+
+    public function lazyChain($data)
+    {
+        return new \Yo\LazyChain($data);
     }
 }

@@ -57,5 +57,4 @@ class YoChain extends TestCase
           ->value();
         $this->assertEquals($data, 108);
     }
-
 }
