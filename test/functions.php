@@ -61,4 +61,10 @@ class YoFunctions extends TestCase
         $this->assertEquals($yo->inRange(1, 'string', 500), false);
         $this->assertEquals($yo->inRange(1, 100, 'string'), false);
     }
+
+    public function testMethodCount()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->methodCount(), 45);
+    }
 }

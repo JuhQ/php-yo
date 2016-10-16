@@ -3,7 +3,7 @@ namespace Yo;
 
 include_once('chain.php');
 include_once('lazy-chain.php');
-
+include_once('math-chain.php');
 
 class Yo
 {
@@ -145,6 +145,11 @@ class Yo
         return $a + $b;
     }
 
+    public function addSelf($a)
+    {
+        return $a + $a;
+    }
+
     public function subtract($a, $b)
     {
         return $a - $b;
@@ -261,5 +266,16 @@ class Yo
     public function lazyChain($data)
     {
         return new \Yo\LazyChain($data);
+    }
+
+    public function mathChain($data)
+    {
+        return new \Yo\MathChain($data);
+    }
+
+    public function methodCount()
+    {
+        $foo = new \ReflectionClass($this);
+        return $this->size($foo->getMethods());
     }
 }

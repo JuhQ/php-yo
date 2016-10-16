@@ -13,6 +13,12 @@ class YoMath extends TestCase
         $this->assertEquals($yo->add(1, 2), 3);
     }
 
+    public function testSelfAdd()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->addSelf(1, 1), 2);
+    }
+
     public function testSubtract()
     {
         $yo = new Yo();
@@ -113,5 +119,22 @@ class YoMath extends TestCase
         $this->assertEquals($yo->factorial(18), 6402373705728000);
         $this->assertEquals($yo->factorial(19), 121645100408832000);
         $this->assertEquals($yo->factorial(20), 2432902008176640000);
+    }
+
+    public function testMathChain()
+    {
+        $yo = new Yo();
+
+        $result = $yo->mathChain(100)
+            ->add(1)
+            ->addSelf()
+            ->subtract(50)
+            ->divide(2)
+            ->multiply(5)
+            ->sum([50, 100, 200, 300])
+            ->mean([50, 100, 200, 300])
+            ->value();
+
+        $this->assertEquals($result, 336);
     }
 }
