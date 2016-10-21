@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Yo;
 
 include_once('chain.php');
@@ -7,62 +9,166 @@ include_once('math-chain.php');
 
 class Yo
 {
-    public function lowercase($str)
+    public function always(): bool
+    {
+        return true;
+    }
+
+    public function never(): bool
+    {
+        return false;
+    }
+
+    public function isFalsey($val): bool
+    {
+        return !$val;
+    }
+
+    public function isTruthy($val): bool
+    {
+        return !$this->isFalsey($val);
+    }
+
+    public function compact($arr): array
+    {
+        return $this->filter($arr, [$this, 'isTruthy']);
+    }
+
+    public function every($arr, $callback = null): bool
+    {
+        $results = $this->map($arr, function ($item) use ($callback) {
+            if (isset($callback) && $this->isFunction($callback)) {
+                return $callback($item);
+            }
+
+            return $this->isTruthy($item);
+        });
+
+        return $this->size($this->compact($results)) === $this->size($arr);
+    }
+
+    public function some($arr, $callback = null): bool
+    {
+        $results = $this->map($arr, function ($item) use ($callback) {
+            if (isset($callback) && $this->isFunction($callback)) {
+                return $callback($item);
+            }
+
+            return $item;
+        });
+
+        return $this->size($this->compact($results)) > 0;
+    }
+
+    public function none($arr, $callback = null): bool
+    {
+        return $this->reduce($arr, function ($bool, $item) use ($callback) {
+            if (!$bool) {
+                return false;
+            }
+
+            if (isset($callback) && $this->isFunction($callback)) {
+                return !$callback($item);
+            }
+
+            if ($item) {
+                return false;
+            }
+
+            return $bool;
+        }, true);
+    }
+
+    public function lowercase(string $str): string
     {
         return strtolower($str);
     }
 
-    public function uppercase($str)
+    public function uppercase(string $str): string
     {
         return strtoupper($str);
     }
 
-    public function capitalize($str)
+    public function capitalize(string $str): string
     {
         return $this->uppercase($this->first($str)) . $this->lowercase($this->rest($str));
     }
 
-    public function kebabCase($str)
+    public function snakeCase(string $str): string
     {
-        return $this->lowercase(implode('-', explode(' ', trim($str))));
+        $words = preg_split('/[ -_]+/', $this->lowercase(trim($str)));
+        return implode('_', $this->reject($words, [$this, 'isEmpty']));
     }
 
-    public function isString($val)
+    public function kebabCase(string $str): string
+    {
+        $words = preg_split('/[ -_]+/', $this->lowercase(trim($str)));
+        return implode('-', $this->reject($words, [$this, 'isEmpty']));
+    }
+
+    public function camelCase(string $str): string
+    {
+        $words = preg_split('/[ -_]+/', $this->lowercase(trim($str)));
+        $words = $this->reject($words, [$this, 'isEmpty']);
+
+        $rest = implode('', $this->map($this->rest($words), [$this, 'capitalize']));
+
+        return $this->first($words) . $rest;
+    }
+
+    public function repeat(string $str, int $n): string
+    {
+        return implode('', $this->map($this->times($n - 1), function () use ($str) {
+            return $str;
+        }));
+    }
+
+    public function isString($val): bool
     {
         return is_string($val);
     }
 
-    public function isArray($val)
+    public function isFunction($val): bool
+    {
+        return is_callable($val);
+    }
+
+    public function isArray($val): bool
     {
         return is_array($val);
     }
 
-    public function isEmpty($val)
+    public function isObject($val): bool
+    {
+        return is_object($val);
+    }
+
+    public function isEmpty($val): bool
     {
         return $this->size($val) === 0;
     }
 
-    public function isFinite($n)
+    public function isFinite($n): bool
     {
         return $this->isNumber($n) && is_finite($n);
     }
 
-    public function isPositive($n)
+    public function isPositive($n): bool
     {
         return $this->isFinite($n) && $n > 0;
     }
 
-    public function isNegative($n)
+    public function isNegative($n): bool
     {
         return $this->isFinite($n) && $n < 0;
     }
 
-    public function isNumber($val)
+    public function isNumber($val): bool
     {
         return is_int($val) || is_float($val);
     }
 
-    public function isPalindrome($str)
+    public function isPalindrome($str): bool
     {
         if (!$this->isString($str)) {
             return false;
@@ -77,7 +183,32 @@ class Yo
         return $word === $this->reverse($word);
     }
 
-    public function size($val)
+    public function isEqual($a, $b): bool
+    {
+        return $a === $b;
+    }
+
+    public function gt(int $a, int $b): bool
+    {
+        return $a > $b;
+    }
+
+    public function gte(int $a, int $b): bool
+    {
+        return $a >= $b;
+    }
+
+    public function lt(int $a, int $b): bool
+    {
+        return $a < $b;
+    }
+
+    public function lte(int $a, int $b): bool
+    {
+        return $a <= $b;
+    }
+
+    public function size($val): int
     {
         if ($this->isString($val)) {
             return strlen($val);
@@ -86,8 +217,7 @@ class Yo
         return count($val);
     }
 
-    // TODO: no tests for this function
-    public function random($min = 0, $max = 0)
+    public function random($min = 0, $max = 0): int
     {
         if (!$this->isNumber($min)) {
             $min = 0;
@@ -99,17 +229,17 @@ class Yo
         return mt_rand($min, $max);
     }
 
-    public function range($n)
+    public function range(int $n): array
     {
         return range(0, $n);
     }
 
-    public function times($n)
+    public function times(int $n): array
     {
         return $this->range($n);
     }
 
-    public function inRange($min, $max, $value)
+    public function inRange($min, $max, $value): bool
     {
         if (!$this->isNumber($min) || !$this->isNumber($max) || !$this->isNumber($value)) {
             return false;
@@ -118,18 +248,24 @@ class Yo
         return ($min <= $value) && ($value <= $max);
     }
 
-    public function filter($arr, $callback)
+    public function filter($arr, $callback): array
     {
         return array_values(array_filter($arr, $callback));
     }
 
-    // TODO: no tests for this function
-    public function sample($arr)
+    public function reject($arr, $callback): array
+    {
+        return $this->filter($arr, function ($item) use ($callback) {
+            return !$callback($item);
+        });
+    }
+
+    public function sample(array $arr)
     {
         return $this->first(shuffle($arr));
     }
 
-    public function map($arr, $callback = false)
+    public function map($arr, $callback = false): array
     {
         if (!$callback) {
             if ($this->isString($arr)) {
@@ -140,42 +276,42 @@ class Yo
         return array_map($callback, $arr);
     }
 
-    public function add($a, $b)
+    public function add($a, $b): int
     {
         return $a + $b;
     }
 
-    public function addSelf($a)
+    public function addSelf($a): int
     {
         return $a + $a;
     }
 
-    public function subtract($a, $b)
+    public function subtract($a, $b): int
     {
         return $a - $b;
     }
 
-    public function multiply($a, $b)
+    public function multiply($a, $b): int
     {
         return $a * $b;
     }
 
-    public function divide($a, $b)
+    public function divide($a, $b): int
     {
         return $a / $b;
     }
 
-    public function mean($arr)
+    public function mean($arr): int
     {
         return $this->divide($this->sum($arr), $this->size($arr));
     }
 
-    public function sum($arr)
+    public function sum($arr): int
     {
         return $this->reduce($arr, [$this, 'add'], 0);
     }
 
-    public function factorial($n)
+    public function factorial($n): int
     {
         return $this->reduce($this->rest($this->times($n)), [$this, 'multiply'], 1);
     }
@@ -185,7 +321,7 @@ class Yo
         return array_reduce($arr, $callback, $initial);
     }
 
-    public function flatten($arr)
+    public function flatten($arr): array
     {
         if ($this->isEmpty($arr)) {
             return [];
@@ -258,24 +394,103 @@ class Yo
         return array_reverse($val);
     }
 
-    public function chain($data)
+    public function isPrime(int $n): bool
+    {
+        $divisor = 2;
+
+        if ($n <= 1) {
+            return false;
+        }
+
+        while ($n > $divisor) {
+            if ($n % $divisor === 0) {
+                return false;
+            }
+
+            $divisor++;
+        }
+
+        return true;
+    }
+
+    public function primeNumbers(int $n): array
+    {
+        return $this->filter($this->times($n), [$this, 'isPrime']);
+    }
+
+    private function doBinarySearch($start, $end, $arr, $value)
+    {
+        if ($start > $end) {
+            return null;
+        }
+        if ($arr[$start] === $value) {
+            return $start;
+        }
+        if ($arr[$end] === $value) {
+            return $end;
+        }
+
+        $middle = floor(($start + $end) / 2);
+        $middleValue = $arr[$middle];
+
+        if ($middleValue === $value) {
+            return $middleValue;
+        } else if ($middleValue > $value) {
+            return $this->doBinarySearch($start + 1, $middle, $arr, $value);
+        } else if ($middleValue < $value) {
+            return $this->doBinarySearch($middle, $end - 1, $arr, $value);
+        }
+
+        return null;
+    }
+
+    public function binarySearch(array $arr, int $value): int
+    {
+        return $this->doBinarySearch(0, $this->size($arr) - 1, $arr, $value);
+    }
+
+    public function fizzbuzz(): array
+    {
+        return $this
+            ->chain(range(1, 100))
+            ->map(function ($i) {
+                $fizz = 'Fizz';
+                $buzz = 'Buzz';
+                $three = $i % 3 === 0;
+                $five = $i % 5 === 0;
+
+                if ($three && $five) {
+                    return $fizz . $buzz;
+                } else if ($three) {
+                    return $fizz;
+                } else if ($five) {
+                    return $buzz;
+                }
+
+                return $i;
+            })
+            ->value();
+    }
+
+    public function chain($data): Chain
     {
         return new \Yo\Chain($data);
     }
 
-    public function lazyChain($data)
+    public function lazyChain($data): LazyChain
     {
         return new \Yo\LazyChain($data);
     }
 
-    public function mathChain($data)
+    public function mathChain($data): MathChain
     {
         return new \Yo\MathChain($data);
     }
 
-    public function methodCount()
+    // TODO: this should reject private methods
+    public function methodCount($obj = null): int
     {
-        $foo = new \ReflectionClass($this);
+        $foo = new \ReflectionClass($obj ?? $this);
         return $this->size($foo->getMethods());
     }
 }

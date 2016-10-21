@@ -68,10 +68,78 @@ class YoArray extends TestCase
         $this->assertEquals($yo->filter([1, 2, 1, 2, 3], $callback), [1, 1]);
     }
 
+    public function testReject()
+    {
+        $callback = function ($i) {
+            return $i === 1;
+        };
+
+        $yo = new Yo();
+        $this->assertEquals($yo->reject([1, 2, 1, 2, 3], $callback), [2, 2, 3]);
+    }
+
     public function testReduce()
     {
         $yo = new Yo();
         $data = $yo->reduce([4, 8, 15, 16, 23, 42], [$yo, 'add'], 0);
         $this->assertEquals($data, 108);
+    }
+
+    public function testCompact()
+    {
+        $yo = new Yo();
+        $data = $yo->compact([false, 0, null, '', 1, true]);
+        $this->assertEquals($data, [1, true]);
+    }
+
+    public function testEvery()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->every([1, 2, true, 'string']), true);
+        $this->assertEquals($yo->every([1, 2, true, 'string'], [$yo, 'isTruthy']), true);
+        $this->assertEquals($yo->every([1, 2, true, 'string', false]), false);
+        $this->assertEquals($yo->every([1, 2, true, 'string', false], [$yo, 'isTruthy']), false);
+        $this->assertEquals($yo->every([1, 2, true, 'string', false], [$yo, 'isFalsey']), false);
+    }
+
+    public function testSome()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->some([0, false, null]), false);
+        $this->assertEquals($yo->some([0, false, null], [$yo, 'isTruthy']), false);
+        $this->assertEquals($yo->some([0, false, null, true]), true);
+        $this->assertEquals($yo->some([0, false, null, true], [$yo, 'isTruthy']), true);
+        $this->assertEquals($yo->some([1, 2, true, 'string']), true);
+        $this->assertEquals($yo->some([1, 2, true, 'string'], [$yo, 'isTruthy']), true);
+        $this->assertEquals($yo->some([1, 2, true, 'string', false]), true);
+        $this->assertEquals($yo->some([1, 2, true, 'string', false], [$yo, 'isTruthy']), true);
+    }
+
+    public function testNone()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->none([0, false, null]), true);
+        $this->assertEquals($yo->none([0, false, null, true], [$yo, 'never']), true);
+        $this->assertEquals($yo->none([0, false, null, true, 'string']), false);
+        $this->assertEquals($yo->none([0, false, null], [$yo, 'isFalsey']), false);
+        $this->assertEquals($yo->none([0, false, null], [$yo, 'isTruthy']), true);
+    }
+
+    public function testBinarySearch()
+    {
+        $data = [1, 2, 3, 4, 3, 4, 200, 300];
+
+        $yo = new Yo();
+        $result = $yo->binarySearch($data, 200);
+
+        $this->assertEquals($yo->binarySearch([1, 2, 3, 4], 3), 2);
+        $this->assertEquals($yo->binarySearch($data, 200), 6);
+        $this->assertEquals($data[$result], 200);
+    }
+
+    public function testSample()
+    {
+        $yo = new Yo();
+        $this->assertContains($yo->sample([0, 1, 2]), [0, 1, 2]);
     }
 }

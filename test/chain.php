@@ -29,6 +29,17 @@ class YoChain extends TestCase
         $this->assertEquals($data, [1, 1]);
     }
 
+    public function testReject()
+    {
+        $callback = function ($i) {
+            return $i === 1;
+        };
+
+        $yo = new Yo();
+        $data = $yo->chain([1, 2, 1, 2])->reject($callback)->value();
+        $this->assertEquals($data, [2, 2]);
+    }
+
     public function testMapAndFilter()
     {
         $add = function ($val) {
@@ -46,6 +57,36 @@ class YoChain extends TestCase
           ->value();
 
         $this->assertEquals($data, [1, 1]);
+    }
+
+    public function testMapAndReject()
+    {
+        $add = function ($val) {
+            return $val + 1;
+        };
+        $callback = function ($i) {
+            return $i === 1;
+        };
+
+        $yo = new Yo();
+        $data = $yo
+          ->chain([1, 2, 0, 0, 100])
+          ->map($add)
+          ->reject($callback)
+          ->value();
+
+        $this->assertEquals($data, [2, 3, 101]);
+    }
+
+    public function testJson()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->lazyChain([1, 2, 0, 0, 100])
+          ->map([$yo, 'addSelf'])
+          ->toJSON();
+
+        $this->assertEquals($data, '[2,4,0,0,200]');
     }
 
     public function testReduce()

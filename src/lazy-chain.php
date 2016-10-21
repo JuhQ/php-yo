@@ -26,6 +26,12 @@ class LazyChain
         return $this;
     }
 
+    public function reject($callback)
+    {
+        array_push($this->actions, ['action' => 'reject', 'callback' => $callback]);
+        return $this;
+    }
+
     public function reduce($callback, $initial)
     {
         array_push($this->actions, ['action' => 'reduce', 'callback' => $callback, 'attributes' => $initial]);
@@ -44,5 +50,10 @@ class LazyChain
         }
 
         return $result;
+    }
+
+    public function toJSON(): string
+    {
+        return json_encode($this->value());
     }
 }

@@ -23,43 +23,84 @@ class YoLazyChainTest extends TestCase
         $this->assertEquals($data, [2, 3]);
     }
 
-    // public function testFilter()
-    // {
-    //     $callback = function ($i) {
-    //         return $i === 1;
-    //     };
+    public function testFilter()
+    {
+        $callback = function ($i) {
+            return $i === 1;
+        };
 
-    //     $yo = new Yo();
-    //     $data = $yo->lazyChain([1, 2, 1, 2])->filter($callback)->value();
-    //     $this->assertEquals($data, [1, 1]);
-    // }
+        $yo = new Yo();
+        $data = $yo->lazyChain([1, 2, 1, 2])->filter($callback)->value();
+        $this->assertEquals($data, [1, 1]);
+    }
 
-    // public function testMapAndFilter()
-    // {
-    //     $add = function ($val) {
-    //         return $val + 1;
-    //     };
-    //     $callback = function ($i) {
-    //         return $i === 1;
-    //     };
+    public function testReject()
+    {
+        $callback = function ($i) {
+            return $i === 1;
+        };
 
-    //     $yo = new Yo();
-    //     $data = $yo
-    //       ->lazyChain([1, 2, 0, 0, 100])
-    //       ->map($add)
-    //       ->filter($callback)
-    //       ->value();
+        $yo = new Yo();
+        $data = $yo->lazyChain([1, 2, 1, 2])->reject($callback)->value();
+        $this->assertEquals($data, [2, 2]);
+    }
 
-    //     $this->assertEquals($data, [1, 1]);
-    // }
+    public function testMapAndFilter()
+    {
+        $add = function ($val) {
+            return $val + 1;
+        };
+        $callback = function ($i) {
+            return $i === 1;
+        };
 
-    // public function testReduce()
-    // {
-    //     $yo = new Yo();
-    //     $data = $yo
-    //       ->lazyChain([4, 8, 15, 16, 23, 42])
-    //       ->reduce([$yo, 'add'], 0)
-    //       ->value();
-    //     $this->assertEquals($data, 108);
-    // }
+        $yo = new Yo();
+        $data = $yo
+          ->lazyChain([1, 2, 0, 0, 100])
+          ->map($add)
+          ->filter($callback)
+          ->value();
+
+        $this->assertEquals($data, [1, 1]);
+    }
+
+    public function testMapAndReject()
+    {
+        $add = function ($val) {
+            return $val + 1;
+        };
+        $callback = function ($i) {
+            return $i === 1;
+        };
+
+        $yo = new Yo();
+        $data = $yo
+          ->lazyChain([1, 2, 0, 0, 100])
+          ->map($add)
+          ->reject($callback)
+          ->value();
+
+        $this->assertEquals($data, [2, 3, 101]);
+    }
+
+    public function testJson()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->lazyChain([1, 2, 0, 0, 100])
+          ->map([$yo, 'addSelf'])
+          ->toJSON();
+
+        $this->assertEquals($data, '[2,4,0,0,200]');
+    }
+
+    public function testReduce()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->lazyChain([4, 8, 15, 16, 23, 42])
+          ->reduce([$yo, 'add'], 0)
+          ->value();
+        $this->assertEquals($data, 108);
+    }
 }

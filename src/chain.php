@@ -25,6 +25,12 @@ class Chain
         return $this;
     }
 
+    public function reject($callback)
+    {
+        $this->data = $this->yo->reject($this->data, $callback);
+        return $this;
+    }
+
     public function reduce($callback, $initial)
     {
         $this->data = $this->yo->reduce($this->data, $callback, $initial);
@@ -34,5 +40,10 @@ class Chain
     public function value()
     {
         return $this->data;
+    }
+
+    public function toJSON(): string
+    {
+        return json_encode($this->value());
     }
 }
