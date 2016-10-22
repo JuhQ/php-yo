@@ -717,16 +717,16 @@ class Yo
         };
     }
 
-    public function findKey($obj, $item)
+    public function findKey($obj, $key)
     {
-        return $obj[$item] ?? false;
+        return $obj[$key] ?? false;
     }
 
     public function get(array $val, string $path)
     {
         $keys = $this->compact(explode('.', $path));
         return $this->reduce($keys, function ($initial, $key) {
-            return $initial[$key];
+            return $this->findKey($initial, $key);
         }, $val);
     }
 

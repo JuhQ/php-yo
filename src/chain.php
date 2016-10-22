@@ -31,6 +31,60 @@ class Chain
         return $this;
     }
 
+    public function find($callback, $useBinarySearch = false)
+    {
+        $this->data = $this->yo->find($this->data, $callback, $useBinarySearch);
+        return $this;
+    }
+
+    public function findKey($key)
+    {
+        $this->data = $this->yo->findKey($this->data, $key);
+        return $this;
+    }
+
+    public function pick($callback)
+    {
+        $this->data = $this->yo->pick($this->data, $callback);
+        return $this;
+    }
+
+    public function drop($n)
+    {
+        $this->data = $this->yo->drop($this->data, $n);
+        return $this;
+    }
+
+    public function dropRight($n)
+    {
+        $this->data = $this->yo->dropRight($this->data, $n);
+        return $this;
+    }
+
+    public function flatten()
+    {
+        $this->data = $this->yo->flatten($this->data);
+        return $this;
+    }
+
+    public function reverse()
+    {
+        $this->data = $this->yo->reverse($this->data);
+        return $this;
+    }
+
+    public function first()
+    {
+        $this->data = $this->yo->first($this->data);
+        return $this;
+    }
+
+    public function rest()
+    {
+        $this->data = $this->yo->rest($this->data);
+        return $this;
+    }
+
     public function reduce($callback, $initial)
     {
         $this->data = $this->yo->reduce($this->data, $callback, $initial);

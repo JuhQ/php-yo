@@ -98,4 +98,96 @@ class YoChain extends TestCase
           ->value();
         $this->assertEquals($data, 108);
     }
+
+    public function testFind()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->chain([4, 8, 15, 16, 23, 42])
+          ->find(function ($i) {
+            return $i === 4;
+          })
+          ->value();
+        $this->assertEquals($data, 4);
+    }
+
+    public function testFindKey()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->chain(['a' => 1, 'b' => 2])
+          ->findKey('a')
+          ->value();
+        $this->assertEquals($data, 1);
+    }
+
+    public function testPick()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->chain(['a' => 1, 'b' => 2])
+          ->findKey('a')
+          ->value();
+        $this->assertEquals($data, 1);
+    }
+
+    public function testDrop()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->chain([1, 2, 3, 4])
+          ->drop(2)
+          ->value();
+        $this->assertEquals($data, [3, 4]);
+    }
+
+    public function testDropRight()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->chain([1, 2, 3, 4])
+          ->dropRight(2)
+          ->value();
+        $this->assertEquals($data, [1, 2]);
+    }
+
+    public function testFlatten()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->chain([[1], [2], [3, 4]])
+          ->flatten()
+          ->value();
+        $this->assertEquals($data, [1, 2, 3, 4]);
+    }
+
+    public function testFirst()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->chain([1, 2, 3, 4])
+          ->first()
+          ->value();
+        $this->assertEquals($data, 1);
+    }
+
+    public function testRest()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->chain([1, 2, 3, 4])
+          ->rest()
+          ->value();
+        $this->assertEquals($data, [2, 3, 4]);
+    }
+
+    public function testReverse()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->chain([1, 2, 3, 4])
+          ->reverse()
+          ->value();
+        $this->assertEquals($data, [4, 3, 2, 1]);
+    }
 }
