@@ -19,74 +19,6 @@ class YoFunctions extends TestCase
         $this->assertEquals($yo->never(), false);
     }
 
-    public function testIsTruthy()
-    {
-        $yo = new Yo();
-        $this->assertEquals($yo->isTruthy(1), true);
-        $this->assertEquals($yo->isTruthy(true), true);
-        $this->assertEquals($yo->isTruthy($yo->always()), true);
-        $this->assertEquals($yo->isTruthy('string'), true);
-        $this->assertEquals($yo->isTruthy(false), false);
-        $this->assertEquals($yo->isTruthy(0), false);
-        $this->assertEquals($yo->isTruthy(''), false);
-        $this->assertEquals($yo->isTruthy(null), false);
-    }
-
-    public function testIsFalsey()
-    {
-        $yo = new Yo();
-        $this->assertEquals($yo->isFalsey(null), true);
-        $this->assertEquals($yo->isFalsey(0), true);
-        $this->assertEquals($yo->isFalsey(false), true);
-        $this->assertEquals($yo->isFalsey($yo->never()), true);
-        $this->assertEquals($yo->isFalsey(''), true);
-        $this->assertEquals($yo->isFalsey(1), false);
-        $this->assertEquals($yo->isFalsey(true), false);
-        $this->assertEquals($yo->isFalsey($yo->always()), false);
-        $this->assertEquals($yo->isFalsey('string'), false);
-    }
-
-    public function testIsFunction()
-    {
-        $yo = new Yo();
-        $callback = function () {
-            return true;
-        };
-        $this->assertEquals($yo->isFunction($callback), true);
-    }
-
-    public function testIsObject()
-    {
-        $yo = new Yo();
-        $obj = new \stdClass();
-        $php7Obj = new class() {
-        };
-        $this->assertEquals($yo->isObject($obj), true);
-        $this->assertEquals($yo->isObject($php7Obj), true);
-        $this->assertEquals($yo->isObject($yo), true);
-        $this->assertEquals($yo->isObject(false), false);
-        $this->assertEquals($yo->isObject(''), false);
-        $this->assertEquals($yo->isObject([]), false);
-        $this->assertEquals($yo->isObject(1), false);
-    }
-
-    public function testIsEqual()
-    {
-        $yo = new Yo();
-        $this->assertEquals($yo->isEqual(1, 1), true);
-        $this->assertEquals($yo->isEqual(true, true), true);
-        $this->assertEquals($yo->isEqual(null, null), true);
-        $this->assertEquals($yo->isEqual(false, false), true);
-        $this->assertEquals($yo->isEqual('string', 'string'), true);
-        $this->assertEquals($yo->isEqual('1', '1'), true);
-        $this->assertEquals($yo->isEqual(1, 2), false);
-        $this->assertEquals($yo->isEqual(1, null), false);
-        $this->assertEquals($yo->isEqual(1, ''), false);
-        $this->assertEquals($yo->isEqual(1, false), false);
-        $this->assertEquals($yo->isEqual(1, '1'), false);
-        $this->assertEquals($yo->isEqual(null, 'null'), false);
-    }
-
     public function testGt()
     {
         $yo = new Yo();
@@ -199,9 +131,99 @@ class YoFunctions extends TestCase
         $this->assertContains($yo->random(5, 10), [5, 6, 7, 8, 9, 10]);
     }
 
+    public function testCallFunctor()
+    {
+        $add = function ($val) {
+            return $val + 1;
+        };
+
+        $yo = new Yo();
+        $this->assertEquals($yo->callFunctor(1, $add), 2);
+    }
+
+    public function testNegate()
+    {
+        $fn = function () {
+            return true;
+        };
+
+        $yo = new Yo();
+
+        $this->assertEquals($yo->negate($fn), function () {
+        });
+
+        $this->assertEquals($yo->negate($fn)(), false);
+    }
+
+    public function testFlip()
+    {
+        $fn = function () {
+            return true;
+        };
+
+        $yo = new Yo();
+        $flipped = $yo->flip(function (...$args) use ($yo) {
+            return $yo->toArray($args);
+        });
+
+        $this->assertEquals($flipped('a', 'b', 'c', 'd'), ['d', 'c', 'b', 'a']);
+    }
+
+    public function testMatches()
+    {
+        $yo = new Yo();
+
+        $value = $yo->matches(['a' => 1, 'b' => 2, 'c' => 3], ['c' => 3]);
+        $noValue = $yo->matches(['a' => 1, 'b' => 2, 'c' => 3], ['d' => 4]);
+
+        $this->assertEquals($value, true);
+        $this->assertEquals($noValue, false);
+    }
+
+    public function testFindKey()
+    {
+        $yo = new Yo();
+
+        $value = $yo->findKey(['a' => 1, 'b' => 2, 'c' => 3], 'a');
+        $noValue = $yo->findKey(['a' => 1, 'b' => 2, 'c' => 3], 'd');
+
+        $this->assertEquals($value, 1);
+        $this->assertEquals($noValue, false);
+    }
+
+    public function testNoop()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->noop(), null);
+    }
+
+    public function testMemoize()
+    {
+        $yo = new Yo();
+
+        $hello = function ($val) {
+            return $val;
+        };
+
+        $memoized = $yo->memoize($hello);
+        $this->assertEquals($yo->isFunction($memoized), true);
+        $this->assertEquals($memoized(1), 1);
+        $this->assertEquals($memoized(2), 2);
+        $this->assertEquals($memoized(2), 2);
+    }
+
+    public function testGet()
+    {
+        $value = ['a' => ['b' => ['c' => 1]]];
+        $yo = new Yo();
+        $this->assertEquals($yo->get($value, '.a'), ['b' => ['c' => 1]]);
+        $this->assertEquals($yo->get($value, '.a.b'), ['c' => 1]);
+        $this->assertEquals($yo->get($value, '.a.b.c'), 1);
+    }
+
     public function testMethodCount()
     {
         $yo = new Yo();
-        $this->assertEquals($yo->methodCount(), 69);
+        $this->assertEquals($yo->methodCount(), 110);
     }
 }

@@ -110,4 +110,28 @@ class YoStrings extends TestCase
         $this->assertEquals($yo->isEmpty(''), true);
         $this->assertEquals($yo->isEmpty('string'), false);
     }
+
+    public function testWords()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->words('hello world'), ['hello', 'world']);
+    }
+
+    public function testWordCount()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->wordCount('hello world'), 2);
+    }
+
+    public function testReverseWords()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->reverseWords('hello world'), 'world hello');
+    }
+
+    public function testReverseWordsInPlace()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->reverseInPlace('hello world'), 'olleh dlrow');
+    }
 }

@@ -142,4 +142,187 @@ class YoArray extends TestCase
         $yo = new Yo();
         $this->assertContains($yo->sample([0, 1, 2]), [0, 1, 2]);
     }
+
+    public function testToArray()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->toArray('a', 'b', 'c', 'd'), ['a', 'b', 'c', 'd']);
+    }
+
+    public function testSlice()
+    {
+        $value = [1, 2, 3];
+        $yo = new Yo();
+        $this->assertEquals($yo->slice($value, 1, 3), [2, 3]);
+        $this->assertNotEquals($value, [2, 3]);
+        $this->assertEquals($yo->slice([1, 2, 3], 0), [1, 2, 3]);
+        $this->assertEquals($yo->slice([1, 2, 3], 1), [2, 3]);
+        $this->assertEquals($yo->slice([1, 2, 3], 2), [3]);
+        $this->assertEquals($yo->slice([1, 2, 3], 3), []);
+        $this->assertEquals($yo->slice([1, 2, 3], 0, 0), []);
+        $this->assertEquals($yo->slice([1, 2, 3], 0, 1), [1]);
+        $this->assertEquals($yo->slice([1, 2, 3], 0, 2), [1, 2]);
+        $this->assertEquals($yo->slice([1, 2, 3], 1, 3), [2, 3]);
+    }
+
+    public function testDrop()
+    {
+        $value = [1, 2, 3];
+        $yo = new Yo();
+        $this->assertEquals($yo->drop($value, 1), [2, 3]);
+        $this->assertNotEquals($value, [2, 3]);
+        $this->assertEquals($yo->drop([1, 2, 3], 0), [1, 2, 3]);
+        $this->assertEquals($yo->drop([1, 2, 3], 1), [2, 3]);
+        $this->assertEquals($yo->drop([1, 2, 3], 2), [3]);
+        $this->assertEquals($yo->drop([1, 2, 3], 3), []);
+    }
+
+    public function testDropRight()
+    {
+        $value = [1, 2, 3];
+        $yo = new Yo();
+        $this->assertEquals($yo->dropRight($value, 1), [1, 2]);
+        $this->assertNotEquals($value, [1, 2]);
+        $this->assertEquals($yo->dropRight([1, 2, 3], 0), [1, 2, 3]);
+        $this->assertEquals($yo->dropRight([1, 2, 3], 1), [1, 2]);
+        $this->assertEquals($yo->dropRight([1, 2, 3], 2), [1]);
+        $this->assertEquals($yo->dropRight([1, 2, 3], 3), []);
+    }
+
+    public function testFind()
+    {
+        $value = [1, 2, 3];
+        $yo = new Yo();
+        $this->assertEquals($yo->find([1, 2, 3, 4], 3), 3);
+    }
+
+    public function testFindBinarySearch()
+    {
+        $value = [1, 2, 3];
+        $yo = new Yo();
+        $this->assertEquals($yo->find([1, 2, 3, 4], 3, true), 3);
+    }
+
+    public function testWhere()
+    {
+        $value = [['a' => 1], ['b' => 2], ['a' => 1]];
+        $yo = new Yo();
+        $this->assertEquals($yo->where($value, ['a' => 1]), [['a' => 1], ['a' => 1]]);
+    }
+
+    public function testChunk()
+    {
+        $yo = new Yo();
+
+        $value = $yo->chunk([1, 2, 3, 4, 5, 6, 7, 8], 2);
+        $this->assertEquals($value, [[1, 2], [3, 4], [5, 6], [7, 8]]);
+
+        $value2 = $yo->chunk([1, 2, 3, 4, 5, 6, 7, 8], 3);
+        $this->assertEquals($value2, [[1, 2, 3], [4, 5, 6], [7, 8]]);
+
+        $value3 = $yo->chunk([1, 2, 3, 4, 5, 6, 7, 8, 9], 3);
+        $this->assertEquals($value3, [[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+
+        $value4 = $yo->chunk([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 3);
+        $this->assertEquals($value4, [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]);
+    }
+
+    public function testMerge()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->merge([1, 2, 3], [4, 5]), [1, 2, 3, 4, 5]);
+        $this->assertEquals($yo->merge([1, 2, 3], [4, 5], [6]), [1, 2, 3, 4, 5, 6]);
+        $this->assertEquals($yo->merge([1, 2, 3], [4, 5], [6], [7, 8]), [1, 2, 3, 4, 5, 6, 7, 8]);
+    }
+
+    public function testEach()
+    {
+        $val = 0;
+        $yo = new Yo();
+        $yo->each([1, 2], function () use (&$val) {
+            $val++;
+        });
+        $this->assertEquals($val, 2);
+    }
+
+    public function testExtend()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->extend(['a' => 1], ['b' => 2]), ['a' => 1, 'b' => 2]);
+        $this->assertEquals($yo->extend(['a' => 1], ['a' => 2]), ['a' => 2]);
+    }
+
+    public function testFindDuplicates()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->findDuplicates([2, 3, 4, 3, 10, 10]), [3, 10]);
+    }
+
+    public function testSkipDuplicates()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->skipDuplicates([2, 3, 4, 3, 10, 10]), [2, 3, 4, 10]);
+    }
+
+    public function testDuplicate()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->duplicate([1, 2, 3, 4, 5]), [1, 2, 3, 4, 5, 1, 2, 3, 4, 5]);
+    }
+
+    public function testInitial()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->initial([1, 2, 3, 4]), [1, 2, 3]);
+    }
+
+    public function testHead()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->head([1, 2, 3, 4]), 1);
+    }
+
+    public function testTail()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->tail([1, 2, 3, 4]), [2, 3, 4]);
+    }
+
+    public function testIndexOf()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->indexOf([1, 2, 3], 3), 2);
+        $this->assertEquals($yo->indexOf([1, 2, 3], 4), false);
+        $this->assertEquals($yo->indexOf([1, 2, 3], 2, 1), 0);
+        $this->assertEquals($yo->indexOf([1, 2, 3], 3, 1), 1);
+    }
+
+    public function testLastOfTheLastOfTheLast()
+    {
+        $yo = new Yo();
+        $value = $yo->lastOfTheLastOfTheLast([1, 2, [11, 22], [111, [1111, 2222]]]);
+        $this->assertEquals($value, 2222);
+    }
+
+    public function testFindLargestSubArrayBySum()
+    {
+        $yo = new Yo();
+        $value = $yo->findLargestSubArrayBySum([[1, 2, 3, 4, 5000], [1, 2], [2000, 2]]);
+        $this->assertEquals($value, ['index' => 0, 'item' => [1, 2, 3, 4, 5000], 'value' => 5010]);
+    }
+
+    public function testFindPairsBySum()
+    {
+        $yo = new Yo();
+        $value = $yo->findPairsBySum([10, 5, 6, 7, 2, 8, 1, 9, 14], 15);
+        $this->assertEquals($value, [[10, 5], [6, 9], [7, 8], [1, 14]]);
+    }
+
+    public function testPick()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->pick([['a' => 1], ['b' => 2]], ['a' => 1]), [['a' => 1]]);
+        $this->assertEquals($yo->pick([['a' => 1], ['b' => 2]], ['a' => 2]), []);
+        $this->assertEquals($yo->pick([['a' => 1], ['b' => 2], ['b' => 2, 'c' => 3]], ['b' => 2]), [['b' => 2], ['b' => 2, 'c' => 3]]);
+    }
 }

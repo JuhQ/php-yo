@@ -95,6 +95,53 @@ class YoMath extends TestCase
         $this->assertEquals($yo->isNumber([]), false);
     }
 
+    public function testMissingNumber()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->missingNumber([5, 2, 6, 1, 3]), 4);
+    }
+
+    public function testFindLargestSum()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->findLargestSum([1, 2, 3, 4, 5]), 9);
+        $this->assertEquals($yo->findLargestSum([1, 2, 3, 4, 5, 5]), 10);
+        $this->assertEquals($yo->findLargestSum([1, 2, 3, 4, 5, 6]), 11);
+    }
+
+    public function testGreatestCommonDivisor()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->greatestCommonDivisor(14, 21), 7);
+        $this->assertEquals($yo->greatestCommonDivisor(69, 169), 1);
+    }
+
+    public function testFibonacci()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->fibonacci(0), 0);
+        $this->assertEquals($yo->fibonacci(1), 1);
+        $this->assertEquals($yo->fibonacci(2), 1);
+        $this->assertEquals($yo->fibonacci(3), 2);
+        $this->assertEquals($yo->fibonacci(4), 3);
+        $this->assertEquals($yo->fibonacci(5), 5);
+        $this->assertEquals($yo->fibonacci(6), 8);
+        $this->assertEquals($yo->fibonacci(7), 13);
+        $this->assertEquals($yo->fibonacci(8), 21);
+        $this->assertEquals($yo->fibonacci(9), 34);
+        $this->assertEquals($yo->fibonacci(10), 55);
+        $this->assertEquals($yo->fibonacci(11), 89);
+        $this->assertEquals($yo->fibonacci(12), 144);
+        $this->assertEquals($yo->fibonacci(13), 233);
+        $this->assertEquals($yo->fibonacci(14), 377);
+        $this->assertEquals($yo->fibonacci(15), 610);
+        $this->assertEquals($yo->fibonacci(16), 987);
+        $this->assertEquals($yo->fibonacci(17), 1597);
+        $this->assertEquals($yo->fibonacci(18), 2584);
+        $this->assertEquals($yo->fibonacci(19), 4181);
+        $this->assertEquals($yo->fibonacci(20), 6765);
+    }
+
     public function testFactorial()
     {
         $yo = new Yo();
