@@ -22,4 +22,10 @@ class YoMap extends TestCase
         $yo = new Yo();
         $this->assertEquals($yo->map('string'), ['string']);
     }
+
+    public function testMapStringArray()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->map([1, 2], 'hello'), ['hello', 'hello']);
+    }
 }

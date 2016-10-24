@@ -7,6 +7,20 @@ use PHPUnit\Framework\TestCase;
 
 class YoIs extends TestCase
 {
+    public function testIsBoolean()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->isBoolean(true), true);
+        $this->assertEquals($yo->isBoolean(false), true);
+        $this->assertEquals($yo->isBoolean($yo->always()), true);
+        $this->assertEquals($yo->isBoolean($yo->never()), true);
+        $this->assertEquals($yo->isBoolean(null), false);
+        $this->assertEquals($yo->isBoolean('string'), false);
+        $this->assertEquals($yo->isBoolean(0), false);
+        $this->assertEquals($yo->isBoolean(1), false);
+        $this->assertEquals($yo->isBoolean(''), false);
+    }
+
     public function testIsNull()
     {
         $yo = new Yo();
@@ -19,6 +33,7 @@ class YoIs extends TestCase
         $this->assertEquals($yo->isNull(1), false);
         $this->assertEquals($yo->isNull(''), false);
     }
+
     public function testIsTruthy()
     {
         $yo = new Yo();
@@ -90,5 +105,19 @@ class YoIs extends TestCase
         $this->assertEquals($yo->isEqual(1, false), false);
         $this->assertEquals($yo->isEqual(1, '1'), false);
         $this->assertEquals($yo->isEqual(null, 'null'), false);
+    }
+
+    public function testIsEven()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->isEven(1), false);
+        $this->assertEquals($yo->isEven(2), true);
+    }
+
+    public function testIsOdd()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->isOdd(1), true);
+        $this->assertEquals($yo->isOdd(2), false);
     }
 }

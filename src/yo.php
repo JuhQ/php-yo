@@ -106,9 +106,17 @@ class Yo
 
     public function repeat(string $str, int $n): string
     {
-        return implode('', $this->map($this->times($n - 1), function () use ($str) {
-            return $str;
-        }));
+        return implode('', $this->times($n - 1, (string) $str));
+    }
+
+    public function fill(array $arr, $val): array
+    {
+        return $this->map($arr, (string) $val);
+    }
+
+    public function isBoolean($val): bool
+    {
+        return is_bool($val);
     }
 
     public function isString($val): bool
@@ -181,6 +189,16 @@ class Yo
         return $a === $b;
     }
 
+    public function isEven(int $n): bool
+    {
+        return $n % 2 === 0;
+    }
+
+    public function isOdd(int $n): bool
+    {
+        return !$this->isEven($n);
+    }
+
     public function gt(int $a, int $b): bool
     {
         return $a > $b;
@@ -227,9 +245,9 @@ class Yo
         return range(0, $n);
     }
 
-    public function times(int $n): array
+    public function times(int $n, $callback = null): array
     {
-        return $this->range($n);
+        return $callback ? $this->map($this->range($n), $callback) : $this->range($n);
     }
 
     public function inRange($min, $max, $value): bool
@@ -248,9 +266,7 @@ class Yo
 
     public function reject($arr, $callback): array
     {
-        return $this->filter($arr, function ($item) use ($callback) {
-            return !$callback($item);
-        });
+        return $this->filter($arr, $this->negate($callback));
     }
 
     public function sample(array $arr)
@@ -266,7 +282,16 @@ class Yo
             }
             return $arr;
         }
-        return array_map($callback, $arr);
+
+        $createCallback = function ($value) use ($callback) {
+            if ($this->isFunction($callback)) {
+                return $callback($value);
+            }
+
+            return $callback;
+        };
+
+        return array_map($createCallback, $arr);
     }
 
     public function add($a, $b): int
@@ -312,6 +337,11 @@ class Yo
     public function reduce($arr, $callback, $initial)
     {
         return array_reduce($arr, $callback, $initial);
+    }
+
+    public function reduceRight($arr, $callback, $initial)
+    {
+        return $this->reduce($this->reverse($arr), $callback, $initial);
     }
 
     public function flatten($arr): array
@@ -637,7 +667,6 @@ class Yo
         return $largest + $this->max($this->reject($arr, $callback));
     }
 
-
     public function greatestCommonDivisor(int $a, int $b): int
     {
         if ($b === 0) {
@@ -725,19 +754,12 @@ class Yo
     public function get(array $val, string $path)
     {
         $keys = $this->compact(explode('.', $path));
-        return $this->reduce($keys, function ($initial, $key) {
-            return $this->findKey($initial, $key);
-        }, $val);
+        return $this->reduce($keys, [$this, 'findKey'], $val);
     }
 
     public function keys($val): array
     {
-        $result = [];
-        foreach ($val as $key => $value) {
-            array_push($result, $key);
-        }
-
-        return $result;
+        return array_keys($val);
     }
 
     public function each(array $arr, $callback)

@@ -32,63 +32,54 @@ class LazyChain
         return $this;
     }
 
-    // TODO: add test
     public function find($callback, $useBinarySearch = false)
     {
         array_push($this->actions, ['action' => 'find', 'callback' => $callback, 'attributes' => $useBinarySearch]);
         return $this;
     }
 
-    // TODO: add test
     public function findKey($key)
     {
         array_push($this->actions, ['action' => 'findKey', 'callback' => $key]);
         return $this;
     }
 
-    // TODO: add test
     public function pick($callback)
     {
         array_push($this->actions, ['action' => 'pick', 'callback' => $callback]);
         return $this;
     }
 
-    // TODO: add test
     public function drop($n)
     {
         array_push($this->actions, ['action' => 'drop', 'callback' => $n]);
         return $this;
     }
 
-    // TODO: add test
     public function dropRight($n)
     {
         array_push($this->actions, ['action' => 'dropRight', 'callback' => $n]);
         return $this;
     }
 
-    // TODO: add test
     public function flatten()
     {
         array_push($this->actions, ['action' => 'flatten']);
         return $this;
     }
 
-    // TODO: add test
     public function reverse()
     {
         array_push($this->actions, ['action' => 'reverse']);
         return $this;
     }
 
-    // TODO: add test
     public function first()
     {
         array_push($this->actions, ['action' => 'first']);
         return $this;
     }
 
-    // TODO: add test
     public function rest()
     {
         array_push($this->actions, ['action' => 'rest']);

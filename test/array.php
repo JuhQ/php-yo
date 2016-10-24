@@ -51,11 +51,18 @@ class YoArray extends TestCase
         $yo = new Yo();
         $this->assertEquals($yo->range(4), [0, 1, 2, 3, 4]);
     }
+
     public function testTimes()
     {
         $yo = new Yo();
         $this->assertEquals($yo->times(4), [0, 1, 2, 3, 4]);
         $this->assertEquals($yo->times(4), $yo->range(4));
+    }
+
+    public function testTimesCallback()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->times(3, [$yo, 'always']), [true, true, true, true]);
     }
 
     public function testFilter()
@@ -79,6 +86,16 @@ class YoArray extends TestCase
     }
 
     public function testReduce()
+    {
+        $yo = new Yo();
+        $data = $yo->reduceRight([16, 23, 42], function ($initial, $i) {
+            array_push($initial, $i . '-hello');
+            return $initial;
+        }, []);
+        $this->assertEquals($data, ['42-hello', '23-hello', '16-hello']);
+    }
+
+    public function testReduceRight()
     {
         $yo = new Yo();
         $data = $yo->reduce([4, 8, 15, 16, 23, 42], [$yo, 'add'], 0);
@@ -324,5 +341,42 @@ class YoArray extends TestCase
         $this->assertEquals($yo->pick([['a' => 1], ['b' => 2]], ['a' => 1]), [['a' => 1]]);
         $this->assertEquals($yo->pick([['a' => 1], ['b' => 2]], ['a' => 2]), []);
         $this->assertEquals($yo->pick([['a' => 1], ['b' => 2], ['b' => 2, 'c' => 3]], ['b' => 2]), [['b' => 2], ['b' => 2, 'c' => 3]]);
+    }
+
+    public function testMatches()
+    {
+        $yo = new Yo();
+
+        $value = $yo->matches(['a' => 1, 'b' => 2, 'c' => 3], ['c' => 3]);
+        $noValue = $yo->matches(['a' => 1, 'b' => 2, 'c' => 3], ['d' => 4]);
+
+        $this->assertEquals($value, true);
+        $this->assertEquals($noValue, false);
+    }
+
+    public function testFindKey()
+    {
+        $yo = new Yo();
+
+        $value = $yo->findKey(['a' => 1, 'b' => 2, 'c' => 3], 'a');
+        $noValue = $yo->findKey(['a' => 1, 'b' => 2, 'c' => 3], 'd');
+
+        $this->assertEquals($value, 1);
+        $this->assertEquals($noValue, false);
+    }
+
+    public function testGet()
+    {
+        $value = ['a' => ['b' => ['c' => 1]]];
+        $yo = new Yo();
+        $this->assertEquals($yo->get($value, '.a'), ['b' => ['c' => 1]]);
+        $this->assertEquals($yo->get($value, '.a.b'), ['c' => 1]);
+        $this->assertEquals($yo->get($value, '.a.b.c'), 1);
+    }
+
+    public function testFill()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->fill([1, 2, 3], 'a'), ['a', 'a', 'a']);
     }
 }

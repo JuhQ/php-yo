@@ -169,28 +169,6 @@ class YoFunctions extends TestCase
         $this->assertEquals($flipped('a', 'b', 'c', 'd'), ['d', 'c', 'b', 'a']);
     }
 
-    public function testMatches()
-    {
-        $yo = new Yo();
-
-        $value = $yo->matches(['a' => 1, 'b' => 2, 'c' => 3], ['c' => 3]);
-        $noValue = $yo->matches(['a' => 1, 'b' => 2, 'c' => 3], ['d' => 4]);
-
-        $this->assertEquals($value, true);
-        $this->assertEquals($noValue, false);
-    }
-
-    public function testFindKey()
-    {
-        $yo = new Yo();
-
-        $value = $yo->findKey(['a' => 1, 'b' => 2, 'c' => 3], 'a');
-        $noValue = $yo->findKey(['a' => 1, 'b' => 2, 'c' => 3], 'd');
-
-        $this->assertEquals($value, 1);
-        $this->assertEquals($noValue, false);
-    }
-
     public function testNoop()
     {
         $yo = new Yo();
@@ -212,18 +190,9 @@ class YoFunctions extends TestCase
         $this->assertEquals($memoized(2), 2);
     }
 
-    public function testGet()
-    {
-        $value = ['a' => ['b' => ['c' => 1]]];
-        $yo = new Yo();
-        $this->assertEquals($yo->get($value, '.a'), ['b' => ['c' => 1]]);
-        $this->assertEquals($yo->get($value, '.a.b'), ['c' => 1]);
-        $this->assertEquals($yo->get($value, '.a.b.c'), 1);
-    }
-
     public function testMethodCount()
     {
         $yo = new Yo();
-        $this->assertEquals($yo->methodCount(), 110);
+        $this->assertEquals($yo->methodCount(), 115);
     }
 }
