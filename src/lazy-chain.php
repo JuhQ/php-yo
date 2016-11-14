@@ -92,6 +92,12 @@ class LazyChain
         return $this;
     }
 
+    public function plug($callback)
+    {
+        array_push($this->actions, ['action' => 'callFunctor', 'callback' => $callback]);
+        return $this;
+    }
+
     public function value()
     {
         $result = $this->data;

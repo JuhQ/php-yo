@@ -180,9 +180,12 @@ class YoMath extends TestCase
             ->multiply(5)
             ->sum([50, 100, 200, 300])
             ->mean([50, 100, 200, 300])
+            ->plug(function ($val) {
+                return $val + 50;
+            })
             ->value();
 
-        $this->assertEquals($result, 336);
+        $this->assertEquals($result, 386);
     }
 
     public function testIsPrime()

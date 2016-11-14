@@ -111,10 +111,23 @@ class YoStrings extends TestCase
         $this->assertEquals($yo->isEmpty('string'), false);
     }
 
+    public function testSplitBy()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->splitBy('hello world', ' '), ['hello', 'world']);
+        $this->assertEquals($yo->splitBy('hello world', 'o'), ['hell', ' w', 'rld']);
+    }
+
     public function testWords()
     {
         $yo = new Yo();
         $this->assertEquals($yo->words('hello world'), ['hello', 'world']);
+    }
+
+    public function testLetters()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->letters('hello world'), ['h', 'e', 'l', 'l', 'o', 'w', 'o', 'r', 'l', 'd']);
     }
 
     public function testWordCount()
@@ -133,5 +146,11 @@ class YoStrings extends TestCase
     {
         $yo = new Yo();
         $this->assertEquals($yo->reverseInPlace('hello world'), 'olleh dlrow');
+    }
+
+    public function testTrim()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->trim('  hello world  '), 'hello world');
     }
 }

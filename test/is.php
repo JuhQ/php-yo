@@ -7,6 +7,14 @@ use PHPUnit\Framework\TestCase;
 
 class YoIs extends TestCase
 {
+    public function testIsFloat()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->isFloat(1.0), true);
+        $this->assertEquals($yo->isFloat(1.5), true);
+        $this->assertEquals($yo->isFloat(1), false);
+    }
+
     public function testIsBoolean()
     {
         $yo = new Yo();

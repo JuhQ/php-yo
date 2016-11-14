@@ -55,6 +55,12 @@ class MathChain
         return $this;
     }
 
+    public function plug($callback)
+    {
+        $this->data = $callback($this->data);
+        return $this;
+    }
+
     public function value()
     {
         return $this->data;

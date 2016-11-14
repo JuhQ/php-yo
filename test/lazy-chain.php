@@ -195,4 +195,16 @@ class YoLazyChainTest extends TestCase
           ->value();
         $this->assertEquals($data, [4, 3, 2, 1]);
     }
+
+    public function testPlug()
+    {
+        $yo = new Yo();
+        $data = $yo
+          ->lazyChain([1, 2, 3, 4])
+          ->plug(function ($val) use ($yo) {
+            return $yo->sum($val);
+          })
+          ->value();
+        $this->assertEquals($data, 10);
+    }
 }

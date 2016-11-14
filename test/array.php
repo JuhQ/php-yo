@@ -160,6 +160,30 @@ class YoArray extends TestCase
         $this->assertContains($yo->sample([0, 1, 2]), [0, 1, 2]);
     }
 
+    public function testShuffle()
+    {
+        $yo = new Yo();
+        $this->assertContains($yo->shuffle([0, 1, 2]), [0, 1, 2]);
+    }
+
+    public function testNth()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->nth([1, 2, 3], 1), 2);
+    }
+
+    public function testNext()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->next([1, 2, 3], 1), 3);
+    }
+
+    public function testPrevious()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->previous([1, 2, 3], 1), 1);
+    }
+
     public function testToArray()
     {
         $yo = new Yo();
@@ -378,5 +402,45 @@ class YoArray extends TestCase
     {
         $yo = new Yo();
         $this->assertEquals($yo->fill([1, 2, 3], 'a'), ['a', 'a', 'a']);
+    }
+
+    public function testDifference()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->difference([1, 2, 3, 7], [3, 2, 1, 4, 5]), [7, 4, 5]);
+    }
+
+    public function testContains()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->contains([1, 2, 3, 7], 1), true);
+        $this->assertEquals($yo->contains([1, 2, 3, 7], 10), false);
+    }
+
+    public function testValues()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->values([1, 2, 3, 7]), [1, 2, 3, 7]);
+        $this->assertEquals($yo->values(['hello' => 1, 'world' => 2]), [1, 2]);
+    }
+
+    public function testKeys()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->keys([1, 2, 3, 7]), [0, 1, 2, 3]);
+        $this->assertEquals($yo->keys(['hello' => 1, 'world' => 2]), ['hello', 'world']);
+    }
+
+    public function testUnion()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->union([1, 2, 3, 7], [8, 4, 5]), [1, 2, 3, 7, 8, 4, 5]);
+        $this->assertEquals($yo->union([2], [1, 2]), [2, 1]);
+    }
+
+    public function testPairs()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->pairs(['a' => 1, 'b' => 2, 'c' => 3]), [['a', 1], ['b', 2], ['c', 3]]);
     }
 }

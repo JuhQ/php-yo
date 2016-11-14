@@ -9,6 +9,8 @@ include_once('math-chain.php');
 
 class Yo
 {
+    private $uniqueIdValue = 0;
+
     public function always(): bool
     {
         return true;
@@ -23,6 +25,106 @@ class Yo
     {
     }
 
+    public function now()
+    {
+        return time();
+    }
+
+    public function uniqueId(): int
+    {
+        return $this->uniqueIdValue++;
+    }
+
+    public function isBoolean($val): bool
+    {
+        return is_bool($val);
+    }
+
+    public function isString($val): bool
+    {
+        return is_string($val);
+    }
+
+    public function isFunction($val): bool
+    {
+        return is_callable($val);
+    }
+
+    public function isArray($val): bool
+    {
+        return is_array($val);
+    }
+
+    public function isObject($val): bool
+    {
+        return is_object($val);
+    }
+
+    public function isEmpty($val): bool
+    {
+        return $this->size($val) === 0;
+    }
+
+    public function isFinite($n): bool
+    {
+        return $this->isNumber($n) && is_finite($n);
+    }
+
+    public function isPositive($n): bool
+    {
+        return $this->isFinite($n) && $n > 0;
+    }
+
+    public function isNegative($n): bool
+    {
+        return $this->isFinite($n) && $n < 0;
+    }
+
+    public function isNumber($val): bool
+    {
+        return is_int($val) || is_float($val);
+    }
+
+    public function isFloat($val): bool
+    {
+        return is_float($val);
+    }
+
+    public function isNull($val): bool
+    {
+        return is_null($val);
+    }
+
+    public function isPalindrome($str): bool
+    {
+        if (!$this->isString($str)) {
+            return false;
+        }
+
+        if ($this->size($str) <= 2) {
+            return true;
+        }
+
+        $word = preg_replace('/[\W_]/', '', $this->lowercase(trim($str)));
+
+        return $word === $this->reverse($word);
+    }
+
+    public function isEqual($a, $b): bool
+    {
+        return $a === $b;
+    }
+
+    public function isEven(int $n): bool
+    {
+        return $n % 2 === 0;
+    }
+
+    public function isOdd(int $n): bool
+    {
+        return !$this->isEven($n);
+    }
+
     public function isFalsey($val): bool
     {
         return !$val;
@@ -31,6 +133,25 @@ class Yo
     public function isTruthy($val): bool
     {
         return !$this->isFalsey($val);
+    }
+
+    public function isPrime(int $n): bool
+    {
+        $divisor = 2;
+
+        if ($n <= 1) {
+            return false;
+        }
+
+        while ($n > $divisor) {
+            if ($n % $divisor === 0) {
+                return false;
+            }
+
+            $divisor++;
+        }
+
+        return true;
     }
 
     public function compact($arr): array
@@ -114,91 +235,6 @@ class Yo
         return $this->map($arr, (string) $val);
     }
 
-    public function isBoolean($val): bool
-    {
-        return is_bool($val);
-    }
-
-    public function isString($val): bool
-    {
-        return is_string($val);
-    }
-
-    public function isFunction($val): bool
-    {
-        return is_callable($val);
-    }
-
-    public function isArray($val): bool
-    {
-        return is_array($val);
-    }
-
-    public function isObject($val): bool
-    {
-        return is_object($val);
-    }
-
-    public function isEmpty($val): bool
-    {
-        return $this->size($val) === 0;
-    }
-
-    public function isFinite($n): bool
-    {
-        return $this->isNumber($n) && is_finite($n);
-    }
-
-    public function isPositive($n): bool
-    {
-        return $this->isFinite($n) && $n > 0;
-    }
-
-    public function isNegative($n): bool
-    {
-        return $this->isFinite($n) && $n < 0;
-    }
-
-    public function isNumber($val): bool
-    {
-        return is_int($val) || is_float($val);
-    }
-
-    public function isNull($val): bool
-    {
-        return is_null($val);
-    }
-
-    public function isPalindrome($str): bool
-    {
-        if (!$this->isString($str)) {
-            return false;
-        }
-
-        if ($this->size($str) <= 2) {
-            return true;
-        }
-
-        $word = preg_replace('/[\W_]/', '', $this->lowercase(trim($str)));
-
-        return $word === $this->reverse($word);
-    }
-
-    public function isEqual($a, $b): bool
-    {
-        return $a === $b;
-    }
-
-    public function isEven(int $n): bool
-    {
-        return $n % 2 === 0;
-    }
-
-    public function isOdd(int $n): bool
-    {
-        return !$this->isEven($n);
-    }
-
     public function gt(int $a, int $b): bool
     {
         return $a > $b;
@@ -228,6 +264,16 @@ class Yo
         return count($val);
     }
 
+    public function length($val): int
+    {
+        return $this->size($val);
+    }
+
+    public function trim($val): string
+    {
+        return trim($val);
+    }
+
     public function random($min = 0, $max = 0): int
     {
         if (!$this->isNumber($min)) {
@@ -250,28 +296,46 @@ class Yo
         return $callback ? $this->map($this->range($n), $callback) : $this->range($n);
     }
 
-    public function inRange($min, $max, $value): bool
+    public function inRange(int $a, int $b, int $val): bool
     {
-        if (!$this->isNumber($min) || !$this->isNumber($max) || !$this->isNumber($value)) {
-            return false;
-        }
-
-        return ($min <= $value) && ($value <= $max);
+        return $this->gte($val, $a) && $this->lte($val, $b);
     }
 
-    public function filter($arr, $callback): array
+    public function between(int $a, int $b, int $val): bool
+    {
+        return $this->inRange($a, $b, $val);
+    }
+
+    public function filter(array $arr, $callback): array
     {
         return array_values(array_filter($arr, $callback));
     }
 
-    public function reject($arr, $callback): array
+    public function reject(array $arr, $callback): array
     {
         return $this->filter($arr, $this->negate($callback));
     }
 
     public function sample(array $arr)
     {
-        return $this->first(shuffle($arr));
+        return $this->first($this->shuffle($arr));
+    }
+
+    public function shuffle(array $arr)
+    {
+        return shuffle($arr);
+    }
+
+    public function contains(array $haystack, $needle): bool
+    {
+        return in_array($needle, $haystack, true);
+    }
+
+    public function difference(array $a, array $b): array
+    {
+        return $this->reject($this->merge($a, $b), function ($val) use ($a, $b) {
+            return $this->contains($a, $val) && $this->contains($b, $val);
+        });
     }
 
     public function map($arr, $callback = false): array
@@ -449,6 +513,16 @@ class Yo
         return $this->first(func_get_args());
     }
 
+    public function next($arr, $n)
+    {
+        return $this->nth($arr, $n + 1);
+    }
+
+    public function previous($arr, $n)
+    {
+        return $this->nth($arr, $n - 1);
+    }
+
     public function nth($arr, $n)
     {
         return $arr[$n];
@@ -486,25 +560,6 @@ class Yo
     public function reverseInPlace(string $str): string
     {
         return $this->reverse(implode(' ', $this->reverse(explode(' ', $str))));
-    }
-
-    public function isPrime(int $n): bool
-    {
-        $divisor = 2;
-
-        if ($n <= 1) {
-            return false;
-        }
-
-        while ($n > $divisor) {
-            if ($n % $divisor === 0) {
-                return false;
-            }
-
-            $divisor++;
-        }
-
-        return true;
     }
 
     public function primeNumbers(int $n): array
@@ -757,9 +812,14 @@ class Yo
         return $this->reduce($keys, [$this, 'findKey'], $val);
     }
 
-    public function keys($val): array
+    public function values(array $arr): array
     {
-        return array_keys($val);
+        return array_values($arr);
+    }
+
+    public function keys(array $arr): array
+    {
+        return array_keys($arr);
     }
 
     public function each(array $arr, $callback)
@@ -818,9 +878,22 @@ class Yo
         return array_chunk($arr, $size);
     }
 
+    public function splitBy($val, $delimiter): array
+    {
+        return preg_split('/' . $delimiter . '/', $this->isFunction($val) ? $val() : $val);
+    }
+
     public function words(string $str): array
     {
-        return explode(' ', $str);
+        return $this->splitBy($str, ' ');
+    }
+
+    public function letters(string $str): array
+    {
+        return $this->reject($this->splitBy($str, ''), function ($str) {
+            $delimiterPattern = '/\.| |,|!|\?|:|;|-|_/';
+            return $this->isEmpty($str) || preg_match($delimiterPattern, $str);
+        });
     }
 
     public function wordCount(string $str): int
@@ -840,6 +913,76 @@ class Yo
             $memo[$key] = $callback(...$args);
             return $memo[$key];
         };
+    }
+
+    public function union(array $a, array $b): array
+    {
+        return $this->skipDuplicates($this->merge($a, $b));
+    }
+
+    public function once($fn)
+    {
+        $done = false;
+        $value = null;
+        return function (...$args) use ($fn, &$done, &$value) {
+            if (!$done) {
+                $done = true;
+                $value = $fn(...$args);
+            }
+
+            return $value;
+        };
+    }
+
+    public function after($n, $fn)
+    {
+        $counter = 1;
+        return function (...$args) use ($n, $fn, &$counter) {
+            return $counter++ >= $n ? $fn(...$args) : $this->noop();
+        };
+    }
+
+    public function before($n, $fn)
+    {
+        $counter = 0;
+        return function (...$args) use ($n, $fn, &$counter) {
+            return $counter++ < $n ? $fn(...$args) : $this->noop();
+        };
+    }
+
+    // TODO: refactor
+    public function pairs($val)
+    {
+        $result = [];
+        foreach ($val as $key => $value) {
+            array_push($result, [$key, $value]);
+        }
+
+        return $result;
+    }
+
+    public function wrap($fn, $callback)
+    {
+        return function (...$args) use ($fn, $callback) {
+            return $callback($fn, ...$args);
+        };
+    }
+
+    public function reservedWords(): array
+    {
+        return [
+            'and', 'or', 'xor', '__FILE__', 'exception', '__LINE__',
+            'array', 'as', 'break', 'case', 'class', 'const', 'continue',
+            'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif',
+            'empty', 'enddeclare', 'endfor', 'endforeach', 'endif',
+            'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'for',
+            'foreach', 'function', 'global', 'if', 'include', 'include_once',
+            'isset', 'list', 'new', 'print', 'require', 'require_once', 'return',
+            'static', 'switch', 'unset', 'use', 'var', 'while', '__FUNCTION__',
+            '__CLASS__', '__METHOD__', 'final', 'php_user_filter', 'interface',
+            'implements', 'extends', 'public', 'private', 'protected', 'abstract',
+            'clone', 'try', 'catch','throw', 'cfunction', 'old_function', 'this'
+        ];
     }
 
     public function chain($data): Chain

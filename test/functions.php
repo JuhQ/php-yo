@@ -57,12 +57,6 @@ class YoFunctions extends TestCase
         $this->assertEquals($yo->passthru(1, 2, 3), 1);
     }
 
-    public function testNth()
-    {
-        $yo = new Yo();
-        $this->assertEquals($yo->nth([1, 2, 3], 1), 2);
-    }
-
     public function testFirstArg()
     {
         $yo = new Yo();
@@ -95,15 +89,27 @@ class YoFunctions extends TestCase
         $this->assertEquals($yo->size([1, 2, 3, 4, 5]), 5);
     }
 
+    public function testLength()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->length('the length of this string is 31'), 31);
+        $this->assertEquals($yo->length([1, 2, 3, 4, 5]), 5);
+    }
+
     public function testInRange()
     {
         $yo = new Yo();
         $this->assertEquals($yo->inRange(1, 3, 2), true);
         $this->assertEquals($yo->inRange(1, 100, 50), true);
         $this->assertEquals($yo->inRange(1, 100, 500), false);
-        $this->assertEquals($yo->inRange('string', 100, 500), false);
-        $this->assertEquals($yo->inRange(1, 'string', 500), false);
-        $this->assertEquals($yo->inRange(1, 100, 'string'), false);
+    }
+
+    public function testBetween()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->between(1, 3, 2), true);
+        $this->assertEquals($yo->between(1, 100, 50), true);
+        $this->assertEquals($yo->between(1, 100, 500), false);
     }
 
     public function testFizzBuzz()
@@ -190,9 +196,83 @@ class YoFunctions extends TestCase
         $this->assertEquals($memoized(2), 2);
     }
 
+    public function testOnce()
+    {
+        $yo = new Yo();
+        $yay = $yo->once(function($val) { return $val; });
+
+        $this->assertEquals($yay(true), true);
+        $this->assertEquals($yay(false), true);
+    }
+
+    public function testBefore()
+    {
+        $yo = new Yo();
+        $yay = $yo->before(2, [$yo, 'always']);
+
+        $this->assertEquals($yay(), true);
+        $this->assertEquals($yay(), true);
+        $this->assertEquals($yay(), null);
+    }
+
+    public function testAfter()
+    {
+        $yo = new Yo();
+        $yay = $yo->after(2, [$yo, 'always']);
+
+        $this->assertEquals($yay(), null);
+        $this->assertEquals($yay(), true);
+        $this->assertEquals($yay(), true);
+    }
+
+    public function testWrap()
+    {
+        $yo = new Yo();
+        $yay = $yo->wrap([$yo, 'passthru'], function ($fn, $text) {
+            return '<p>' . $fn($text) . '</p>';
+        });
+
+        $this->assertEquals($yay('hello'), '<p>hello</p>');
+    }
+
+    public function testReservedWords()
+    {
+        $result = [
+            'and', 'or', 'xor', '__FILE__', 'exception', '__LINE__',
+            'array', 'as', 'break', 'case', 'class', 'const', 'continue',
+            'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif',
+            'empty', 'enddeclare', 'endfor', 'endforeach', 'endif',
+            'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'for',
+            'foreach', 'function', 'global', 'if', 'include', 'include_once',
+            'isset', 'list', 'new', 'print', 'require', 'require_once', 'return',
+            'static', 'switch', 'unset', 'use', 'var', 'while', '__FUNCTION__',
+            '__CLASS__', '__METHOD__', 'final', 'php_user_filter', 'interface',
+            'implements', 'extends', 'public', 'private', 'protected', 'abstract',
+            'clone', 'try', 'catch','throw', 'cfunction', 'old_function', 'this'
+        ];
+        $yo = new Yo();
+        $this->assertEquals($yo->reservedWords(), $result);
+    }
+
+    public function testUniqueId()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->uniqueId(), 0);
+        $this->assertEquals($yo->uniqueId(), 1);
+        $this->assertEquals($yo->uniqueId(), 2);
+        $this->assertEquals($yo->uniqueId(), 3);
+    }
+
+    public function testNow()
+    {
+        $yo = new Yo();
+        // TODO: refactor
+        $this->assertGreaterThan(0, $yo->now());
+    }
+
     public function testMethodCount()
     {
         $yo = new Yo();
-        $this->assertEquals($yo->methodCount(), 115);
+        $this->assertEquals($yo->methodCount(), 136);
     }
 }
