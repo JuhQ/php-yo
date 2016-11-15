@@ -199,7 +199,9 @@ class YoFunctions extends TestCase
     public function testOnce()
     {
         $yo = new Yo();
-        $yay = $yo->once(function($val) { return $val; });
+        $yay = $yo->once(function ($val) {
+            return $val;
+        });
 
         $this->assertEquals($yay(true), true);
         $this->assertEquals($yay(false), true);
@@ -233,6 +235,21 @@ class YoFunctions extends TestCase
         });
 
         $this->assertEquals($yay('hello'), '<p>hello</p>');
+    }
+
+    public function testBooleanToInt()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->booleanToInt(true), 1);
+        $this->assertEquals($yo->booleanToInt(false), 0);
+    }
+
+    public function testNthArg()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->nthArg(0)(1, 2, 3), 1);
+        $this->assertEquals($yo->nthArg(1)(1, 2, 3), 2);
+        $this->assertEquals($yo->nthArg(2)(1, 2, 3), 3);
     }
 
     public function testReservedWords()
@@ -273,6 +290,6 @@ class YoFunctions extends TestCase
     public function testMethodCount()
     {
         $yo = new Yo();
-        $this->assertEquals($yo->methodCount(), 136);
+        $this->assertEquals($yo->methodCount(), 153);
     }
 }

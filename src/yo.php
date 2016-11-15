@@ -25,7 +25,7 @@ class Yo
     {
     }
 
-    public function now()
+    public function now(): int
     {
         return time();
     }
@@ -154,7 +154,7 @@ class Yo
         return true;
     }
 
-    public function compact($arr): array
+    public function compact(array $arr): array
     {
         return $this->filter($arr, [$this, 'isTruthy']);
     }
@@ -230,9 +230,22 @@ class Yo
         return implode('', $this->times($n - 1, (string) $str));
     }
 
+    public function partition(array $arr, $predicate): array
+    {
+        return $this->reduce($arr, function ($initial, $val) use ($predicate) {
+            array_push($initial[$this->booleanToInt(!$predicate($val))], $val);
+            return $initial;
+        }, [[], []]);
+    }
+
     public function fill(array $arr, $val): array
     {
         return $this->map($arr, (string) $val);
+    }
+
+    public function pluck(array $arr, $val): array
+    {
+        return $this->map($arr, (string) '.' . $val);
     }
 
     public function gt(int $a, int $b): bool
@@ -269,9 +282,21 @@ class Yo
         return $this->size($val);
     }
 
-    public function trim($val): string
+    public function trim(string $val): string
     {
         return trim($val);
+    }
+
+    public function removeSubstrings(string $str, $substrings): string
+    {
+        $subs = $this->isString($substrings) ?
+            $this->map(explode(',', $substrings), [$this, 'trim']) :
+            $substrings;
+
+        return $this->reduce($subs, function ($initial, $sub) use ($subs) {
+            $value = str_replace($subs, '', $initial);
+            return strpos($value, $sub) ? $this->removeSubstrings($value, $sub) : $value;
+        }, str_replace($subs, '', $str));
     }
 
     public function random($min = 0, $max = 0): int
@@ -308,7 +333,7 @@ class Yo
 
     public function filter(array $arr, $callback): array
     {
-        return array_values(array_filter($arr, $callback));
+        return $this->values(array_filter($arr, $callback, ARRAY_FILTER_USE_BOTH));
     }
 
     public function reject(array $arr, $callback): array
@@ -352,43 +377,49 @@ class Yo
                 return $callback($value);
             }
 
+            if ($this->isString($callback)) {
+                if ($this->first($callback) === '.') {
+                    return $this->get($value, $callback);
+                }
+            }
+
             return $callback;
         };
 
         return array_map($createCallback, $arr);
     }
 
-    public function add($a, $b): int
+    public function add(int $a, int $b): int
     {
         return $a + $b;
     }
 
-    public function addSelf($a): int
+    public function addSelf(int $a): int
     {
         return $a + $a;
     }
 
-    public function subtract($a, $b): int
+    public function subtract(int $a, int $b): int
     {
         return $a - $b;
     }
 
-    public function multiply($a, $b): int
+    public function multiply(int $a, int $b): int
     {
         return $a * $b;
     }
 
-    public function divide($a, $b): int
+    public function divide(int $a, int $b): int
     {
         return $a / $b;
     }
 
-    public function mean($arr): int
+    public function mean(array $arr): int
     {
         return $this->divide($this->sum($arr), $this->size($arr));
     }
 
-    public function sum($arr): int
+    public function sum(array $arr): int
     {
         return $this->reduce($arr, [$this, 'add'], 0);
     }
@@ -398,17 +429,17 @@ class Yo
         return $this->reduce($this->rest($this->times($n)), [$this, 'multiply'], 1);
     }
 
-    public function reduce($arr, $callback, $initial)
+    public function reduce(array $arr, $callback, $initial)
     {
         return array_reduce($arr, $callback, $initial);
     }
 
-    public function reduceRight($arr, $callback, $initial)
+    public function reduceRight(array $arr, $callback, $initial)
     {
         return $this->reduce($this->reverse($arr), $callback, $initial);
     }
 
-    public function flatten($arr): array
+    public function flatten(array $arr): array
     {
         if ($this->isEmpty($arr)) {
             return [];
@@ -429,7 +460,7 @@ class Yo
         return $this->merge($arr, $arr);
     }
 
-    public function extend(...$args)
+    public function extend(array ...$args)
     {
         return $this->reduce($args, function ($initial, $arg) {
             foreach ($arg as $key => $value) {
@@ -440,12 +471,12 @@ class Yo
         }, []);
     }
 
-    public function max($arr)
+    public function max(array $arr)
     {
         return max($arr);
     }
 
-    public function min($arr)
+    public function min(array $arr)
     {
         return min($arr);
     }
@@ -467,7 +498,7 @@ class Yo
 
     public function first($val)
     {
-        return $val[0];
+        return $this->nth($val, 0);
     }
 
     public function last($val)
@@ -482,6 +513,16 @@ class Yo
         }
 
         return $this->slice($val, 1);
+    }
+
+    public function firstKey($val)
+    {
+        return $this->first($this->keys($val));
+    }
+
+    public function firstValue($val)
+    {
+        return $this->first($this->values($val));
     }
 
     public function slice(array $val, int $n, $length = null): array
@@ -513,19 +554,43 @@ class Yo
         return $this->first(func_get_args());
     }
 
-    public function next($arr, $n)
+    public function next(array $arr, int $n)
     {
         return $this->nth($arr, $n + 1);
     }
 
-    public function previous($arr, $n)
+    public function previous(array $arr, int $n)
     {
         return $this->nth($arr, $n - 1);
     }
 
-    public function nth($arr, $n)
+    public function nth($arr, int $n)
     {
         return $arr[$n];
+    }
+
+    public function nthArg(int $n)
+    {
+        return function (...$args) use ($n) {
+            return $this->nth($args, $n);
+        };
+    }
+
+    public function everyNth(array $arr, int $n): array
+    {
+        return $this->filter($arr, function ($val, $i) use ($n) {
+            return ($i + 1) % $n === 0;
+        });
+    }
+
+    public function everyNthWord($val, int $n): array
+    {
+        return $this->everyNth($this->words($val), $n);
+    }
+
+    public function everyNthLetter($val, int $n): array
+    {
+        return $this->everyNth($this->letters($val), $n);
     }
 
     public function firstArg()
@@ -543,6 +608,25 @@ class Yo
         return $this->last(func_get_args());
     }
 
+    public function permutations(array $arr)
+    {
+        if ($this->isEmpty($arr)) {
+            return [[]];
+        }
+
+        $head = $this->first($arr);
+        $tail = $this->tail($arr);
+        $arrSize = $this->size($arr);
+
+        return $this->reduce($this->permutations($tail), function ($initial, $value) use ($arr, $head, $arrSize) {
+            $result = $this->times($arrSize, function ($i) use ($value, $head) {
+                return $this->splice($value, $i, 0, $head);
+            });
+
+            return $this->skipDuplicates(array_merge(...[$initial], ...[$result]));
+        }, []);
+    }
+
     public function reverse($val)
     {
         if ($this->isString($val)) {
@@ -552,7 +636,7 @@ class Yo
         return array_reverse($val);
     }
 
-    public function reverseWords(string $str): string
+    public function reverseWords($str): string
     {
         return implode(' ', $this->reverse($this->words($str)));
     }
@@ -593,12 +677,12 @@ class Yo
         return null;
     }
 
-    public function binarySearch(array $arr, int $value)
+    public function binarySearch(array $arr, int $value): int
     {
         return $this->doBinarySearch(0, $this->size($arr) - 1, $arr, $value);
     }
 
-    public function fibonacci($n = 0)
+    public function fibonacci(int $n = 0): int
     {
         if ($n < 1) {
             return 0;
@@ -629,7 +713,7 @@ class Yo
         return $expected - $this->sum($arr);
     }
 
-    public function findLargestSubArrayBySum(array $arrays)
+    public function findLargestSubArrayBySum(array $arrays): array
     {
         $maxes = $this->map($arrays, function ($arr) {
             return $this->sum($arr);
@@ -640,7 +724,7 @@ class Yo
         return ['index' => $index, 'item' => $arrays[$index], 'value' => $max];
     }
 
-    public function findPairsBySum(array $arr, $targetValue)
+    public function findPairsBySum(array $arr, $targetValue): array
     {
         $i = 0;
         return $this->reduce($arr, function ($initial, $value) use ($arr, $targetValue, &$i) {
@@ -699,6 +783,19 @@ class Yo
         return $this->reduce($arr, function ($value, $item) use ($query) {
             foreach ($query as $key => $val) {
                 if (isset($item[$key]) && $item[$key] && $this->isEqual($item[$key], $val)) {
+                    array_push($value, $item);
+                }
+            }
+
+            return $value;
+        }, []);
+    }
+
+    public function omit(array $arr, $query): array
+    {
+        return $this->reduce($arr, function ($value, $item) use ($query) {
+            foreach ($query as $key => $val) {
+                if (!isset($item[$key]) || !$this->isEqual($item[$key], $val)) {
                     array_push($value, $item);
                 }
             }
@@ -866,7 +963,7 @@ class Yo
         return $this->isTruthy($result);
     }
 
-    public function where($arr, $props): array
+    public function where(array $arr, $props): array
     {
         return $this->filter($arr, function ($entry) use ($props) {
             return $this->matches($entry, $props);
@@ -883,12 +980,12 @@ class Yo
         return preg_split('/' . $delimiter . '/', $this->isFunction($val) ? $val() : $val);
     }
 
-    public function words(string $str): array
+    public function words($str): array
     {
         return $this->splitBy($str, ' ');
     }
 
-    public function letters(string $str): array
+    public function letters($str): array
     {
         return $this->reject($this->splitBy($str, ''), function ($str) {
             $delimiterPattern = '/\.| |,|!|\?|:|;|-|_/';
@@ -950,15 +1047,9 @@ class Yo
         };
     }
 
-    // TODO: refactor
     public function pairs($val)
     {
-        $result = [];
-        foreach ($val as $key => $value) {
-            array_push($result, [$key, $value]);
-        }
-
-        return $result;
+        return array_map(null, $this->keys($val), $this->values($val));
     }
 
     public function wrap($fn, $callback)
@@ -966,6 +1057,38 @@ class Yo
         return function (...$args) use ($fn, $callback) {
             return $callback($fn, ...$args);
         };
+    }
+
+    public function booleanToInt(bool $val): int
+    {
+        return (int) $val;
+    }
+
+    public function zip(array ...$args): array
+    {
+        return array_map(null, ...$args);
+    }
+
+    public function zipObject(array $a, array $b): array
+    {
+        return array_combine($a, $b);
+    }
+
+    public function invert(array $val): array
+    {
+        return $this->zipObject($this->values($val), $this->keys($val));
+    }
+
+    public function splice(array $arr, ...$args): array
+    {
+        array_splice($arr, ...$args);
+        return $arr;
+    }
+
+    public function sort(array $arr): array
+    {
+        sort($arr);
+        return $arr;
     }
 
     public function reservedWords(): array

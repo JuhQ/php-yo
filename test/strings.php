@@ -153,4 +153,29 @@ class YoStrings extends TestCase
         $yo = new Yo();
         $this->assertEquals($yo->trim('  hello world  '), 'hello world');
     }
+
+    public function testEveryNthLetter()
+    {
+        $yo = new Yo();
+        $result = ['e', 'l', 'w', 'r', 'd'];
+        $this->assertEquals($yo->everyNthLetter('hello world', 2), $result);
+        $this->assertEquals($yo->everyNthLetter(function () {
+            return 'hello world';
+        }, 2), $result);
+    }
+
+    public function testEveryNthWord()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->everyNthWord('hello world', 2), ['world']);
+        $this->assertEquals($yo->everyNthWord(function () {
+            return 'hello world';
+        }, 2), ['world']);
+    }
+
+    public function testRemoveSubstrings()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->removeSubstrings('ccdaabcdbb', 'ab,cd'), 'cb');
+    }
 }

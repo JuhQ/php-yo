@@ -28,6 +28,18 @@ class YoArray extends TestCase
         $this->assertEquals($yo->flatten([1, 2, [3, 4, [5, 6]]]), [1, 2, 3, 4, 5, 6]);
     }
 
+    public function testFirstKey()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->firstKey(['a' => 1, 'b' => 2]), 'a');
+    }
+
+    public function testFirstValue()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->firstValue(['a' => 1, 'b' => 2]), 1);
+    }
+
     public function testFirst()
     {
         $yo = new Yo();
@@ -172,6 +184,13 @@ class YoArray extends TestCase
         $this->assertEquals($yo->nth([1, 2, 3], 1), 2);
     }
 
+    public function testEveryNth()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->everyNth([1, 2, 3, 4], 2), [2, 4]);
+        $this->assertEquals($yo->everyNth([1, 2, 3, 4], 3), [3]);
+    }
+
     public function testNext()
     {
         $yo = new Yo();
@@ -204,6 +223,28 @@ class YoArray extends TestCase
         $this->assertEquals($yo->slice([1, 2, 3], 0, 1), [1]);
         $this->assertEquals($yo->slice([1, 2, 3], 0, 2), [1, 2]);
         $this->assertEquals($yo->slice([1, 2, 3], 1, 3), [2, 3]);
+    }
+
+    public function testSplice()
+    {
+        $value = [1, 2];
+        $yo = new Yo();
+        $this->assertEquals($yo->splice($value, 0, 1, 'hello'), ['hello', 2]);
+        $this->assertNotEquals($value, ['hello', 2]);
+        $this->assertEquals($value, [1, 2]);
+
+        $this->assertEquals($yo->splice($value, 0, 1), [2]);
+        $this->assertEquals($yo->splice($value, 0, 0), [1, 2]);
+        $this->assertEquals($yo->splice($value, 0, 0, 'hello'), ['hello', 1, 2]);
+    }
+
+    public function testSort()
+    {
+        $value = [3, 2, 1];
+        $yo = new Yo();
+        $this->assertEquals($yo->sort($value), [1, 2, 3]);
+        $this->assertNotEquals($value, [1, 2, 3]);
+        $this->assertEquals($value, [3, 2, 1]);
     }
 
     public function testDrop()
@@ -442,5 +483,67 @@ class YoArray extends TestCase
     {
         $yo = new Yo();
         $this->assertEquals($yo->pairs(['a' => 1, 'b' => 2, 'c' => 3]), [['a', 1], ['b', 2], ['c', 3]]);
+    }
+
+    public function testZipObject()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->zipObject(['a', 'b'], [1, 2]), ['a' => 1, 'b' => 2]);
+    }
+
+    public function testInvert()
+    {
+        $yo = new Yo();
+        $this->assertEquals($yo->invert(['a' => 1, 'b' => 2]), [1 => 'a', 2 => 'b']);
+    }
+
+    public function testZip()
+    {
+        $yo = new Yo();
+        $value = $yo->zip([1, 2, 3], ['a', 'b', 'c'], ['wat', 'yo', 'poop']);
+        $value2 = $yo->zip([1, 2, 3], ['a', 'b', 'c']);
+
+        $this->assertEquals($value, [[1, 'a', 'wat'], [2, 'b', 'yo'], [3, 'c', 'poop']]);
+        $this->assertEquals($value2, [[1, 'a'], [2, 'b'], [3, 'c']]);
+    }
+
+    public function testPluck()
+    {
+        $yo = new Yo();
+        $value = $yo->pluck([['a' => ['b' => ['hello' => 1]]]], 'a');
+        $this->assertEquals($value, [['b' => ['hello' => 1]]]);
+    }
+
+    public function testOmit()
+    {
+        $yo = new Yo();
+        $value1 = $yo->omit([['a' => 1], ['b' => 2]], ['a' => 1]);
+        $value2 = $yo->omit([['a' => 1], ['b' => 2]], ['a' => 2]);
+        $value3 = $yo->omit([['a' => 1], ['b' => 2], ['b' => 2, 'c' => 3]], ['b' => 2]);
+        $this->assertEquals($value1, [['b' => 2]]);
+        $this->assertEquals($value2, [['a' => 1], ['b' => 2]]);
+        $this->assertEquals($value3, [['a' => 1]]);
+    }
+
+    public function testPartition()
+    {
+        $yo = new Yo();
+        $value = $yo->partition([1, 2, 3, 4], [$yo, 'isOdd']);
+        $this->assertEquals($value, [[1, 3], [2, 4]]);
+    }
+
+    public function testPermutations()
+    {
+        $result = [
+            ['a', 'b', 1],
+            ['b', 'a', 1],
+            ['b', 1, 'a'],
+            ['a', 1, 'b'],
+            [1, 'a', 'b'],
+            [1, 'b', 'a']
+        ];
+        $yo = new Yo();
+        $value = $yo->permutations(['a', 'b', 1]);
+        $this->assertEquals($value, $result);
     }
 }
